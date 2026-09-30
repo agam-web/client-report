@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ohhfo - Meta Ads Performance Dashboard (Sep 2026)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
+
+  <!-- Header Section -->
+  <header class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="bg-blue-600 text-white font-extrabold px-3 py-1 rounded text-sm tracking-wider uppercase">Meta Ads</span>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Ohhfo - Performance Report (Sep 2026)</h1>
+      </div>
+      <p class="text-slate-500 text-sm mt-1">Paid Customer Acquisition &amp; Scaled Revenue Overview</p>
+    </div>
+    
+    <!-- Controls (Timeframe & Primary Metric) -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div>
+        <label for="timeframeSelect" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Timeframe</label>
+        <select id="timeframeSelect" class="bg-white border border-slate-300 text-slate-800 text-sm font-medium rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+          <option value="all">All September (Full Month)</option>
+          <option value="w1">Week 1 (Sep 1 - Sep 7)</option>
+          <option value="w2">Week 2 (Sep 8 - Sep 14)</option>
+          <option value="w3">Week 3 (Sep 15 - Sep 21)</option>
+          <option value="w4">Week 4 (Sep 22 - Sep 30)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="metricSelect" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Primary Metric Graph</label>
+        <select id="metricSelect" class="bg-white border border-slate-300 text-slate-800 text-sm font-medium rounded-lg px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+          <option value="roas">Ads ROAS Trend</option>
+          <option value="cpa">CPA (Cost Per Acquisition ₹)</option>
+          <option value="rev_spend">Ad Spend vs Ad Revenue (₹)</option>
+          <option value="purchases">Purchases (Orders)</option>
+          <option value="funnel">Conversion Funnel Journey</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Top Cards -->
+  <section class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Ad Spend</span>
+      <h3 id="cardSpend" class="text-2xl font-bold text-slate-900 mt-2">₹92,152</h3>
+      <p class="text-xs text-slate-500 mt-1">100% Meta Ads delivery</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-emerald-100 bg-emerald-50/20 shadow-sm">
+      <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Ads ROAS</span>
+      <h3 id="cardROAS" class="text-2xl font-extrabold text-emerald-600 mt-2">5.56x</h3>
+      <p class="text-xs text-emerald-700 font-medium mt-1">Direct Ad Return</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ad Revenue</span>
+      <h3 id="cardRevenue" class="text-2xl font-bold text-slate-900 mt-2">₹5,12,365</h3>
+      <p class="text-xs text-slate-500 mt-1">Direct trackable ad revenue</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Orders</span>
+      <h3 id="cardOrders" class="text-2xl font-bold text-slate-900 mt-2">68</h3>
+      <p class="text-xs text-slate-500 mt-1">744 Add to Carts | 267 Checkouts</p>
+    </div>
+
+    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm col-span-2 lg:col-span-1">
+      <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Cost / Order (CPA)</span>
+      <h3 id="cardCPA" class="text-2xl font-bold text-slate-900 mt-2">₹1,355</h3>
+      <p class="text-xs text-emerald-600 font-medium mt-1">Best CPA: ₹436 (W4)</p>
+    </div>
+  </section>
+
+  <!-- Interactive Dynamic Graph -->
+  <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 id="chartTitle" class="text-lg font-bold text-slate-800">Ads ROAS Performance Trend</h2>
+        <p id="chartSubtitle" class="text-xs text-slate-500">Maintaining strong 5.56x direct return across scaled spending</p>
+      </div>
+      <span id="chartTag" class="text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">Top Performer: Week 4</span>
+    </div>
+    <div class="h-72 md:h-80 w-full relative">
+      <canvas id="performanceChart"></canvas>
+    </div>
+  </section>
+
+  <!-- Positively Framed Strategic Notes (Updates with Week Selection) -->
+  <section class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-6 md:p-7 rounded-xl shadow-md mb-8">
+    <div class="flex items-center gap-2 mb-3">
+      <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+      </svg>
+      <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Weekly Strategic Progress &amp; Growth Insights</h3>
+    </div>
+    <p id="notesContent" class="text-slate-100 text-base leading-relaxed">
+      <!-- Injected Dynamically -->
+    </p>
+    <div id="notesHighlights" class="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+      <!-- Injected Dynamically -->
+    </div>
+  </section>
+
+  <!-- Campaign Performance Table -->
+  <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-bold text-slate-800">Campaign Level Performance Breakdown</h3>
+        <p class="text-xs text-slate-500">Active campaigns in selected period</p>
+      </div>
+      <span class="text-xs bg-slate-100 text-slate-600 font-semibold px-2.5 py-1 rounded">Currency: INR (₹)</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="bg-slate-50 text-slate-500 text-xs uppercase font-semibold border-b border-slate-200">
+            <th class="py-3.5 px-4">Campaign Name</th>
+            <th class="py-3.5 px-4">Ad Spend (₹)</th>
+            <th class="py-3.5 px-4">Link Clicks</th>
+            <th class="py-3.5 px-4">Orders</th>
+            <th class="py-3.5 px-4">CPA (₹)</th>
+            <th class="py-3.5 px-4">Ads ROAS</th>
+            <th class="py-3.5 px-4">Strategic Impact</th>
+          </tr>
+        </thead>
+        <tbody id="campaignTableBody" class="divide-y divide-slate-100 text-slate-700">
+          <!-- Injected Dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Script with Full Logic & Data -->
+  <script>
+    // Indian Currency Formatter (₹)
+    const formatINR = (val) => "₹" + Math.round(val).toLocaleString("en-IN");
+
+    // Master Data Store (Currency ₹, Direct Ads ROAS 5.56x baseline)
+    const dashboardData = {
+      all: {
+        spend: 92152,
+        revenue: 512365,
+        roas: "5.56x",
+        orders: 68,
+        cpa: 1355,
+        notes: "September demonstrated formidable direct account scale, closing at an actual **5.56x Meta Ads ROAS** and delivering **₹5,12,365 in ad-driven revenue**. Customer Lookalike audiences and our latest Advantage+ setups operated with laser precision, driving 68 high-value conversions and 744 Add to Carts. The systematic ramp-up creates ideal momentum for upcoming peak festive scaling.",
+        bullets: [
+          "🎯 **Core Engine:** Customer lookalike audiences drove consistent volume with 22 conversions.",
+          "🚀 **Breakout Win:** New Advantage+ TCPR setup recorded an exceptional 12.69x ROAS.",
+          "📈 **Funnel Health:** 3.90% click-through rate with strong 35.8% cart-to-checkout intent."
+        ],
+        campaigns: [
+          { name: "LLA_Customers_Data_Statics_Video_Conversion", spend: 32219, clicks: 5411, orders: 22, cpa: 1464, roas: "5.70x", impact: "Primary Revenue Driver" },
+          { name: "Adv+TOF-campaign-TCPR (Breakout)", spend: 3523, clicks: 1105, orders: 8, cpa: 440, roas: "12.69x", impact: "Highest Scaling Potential" },
+          { name: "LLA_ABND_Checkout_Catalog_T1_Metro", spend: 19211, clicks: 2865, orders: 12, cpa: 1601, roas: "4.75x", impact: "High-Intent Retargeting" },
+          { name: "TOF_Catalog_All_Products_Golf_T1_Metro", spend: 16249, clicks: 4465, orders: 15, cpa: 1083, roas: "4.60x", impact: "Consistent Daily Volume" },
+          { name: "Remarketing-campaign-6th-sept", spend: 5045, clicks: 508, orders: 4, cpa: 1261, roas: "13.06x", impact: "Hyper-Efficient Conversion" },
+          { name: "Adv+catalog_TOF_campaign", spend: 8305, clicks: 1061, orders: 6, cpa: 1384, roas: "4.57x", impact: "Strong Prospecting Winner" }
+        ]
+      },
+      w1: {
+        spend: 24013,
+        revenue: 134475,
+        roas: "5.60x",
+        orders: 24,
+        cpa: 1001,
+        notes: "An explosive start to September! Week 1 delivered **24 orders at a very lean ₹1,000 CPA**, setting an immediate high benchmark with **5.60x Ads ROAS**. Remarketing opened at peak efficiency (21.7x ROAS), while our core Customer LLA campaigns established immediate resonance with verified buyers.",
+        bullets: [
+          "⚡ **High Order Volume:** 24 orders locked in during the very first week.",
+          "🎯 **Remarketing Spike:** Instant conversion at ₹288 CPA and 21.70x ROAS.",
+          "🛒 **Cart Building:** 215 high-intent Add to Carts and 73 initiated checkouts."
+        ],
+        campaigns: [
+          { name: "LLA_Customers_Data_Statics_Video_Conversion", spend: 10192, clicks: 1669, orders: 8, cpa: 1274, roas: "5.79x", impact: "Volume & Scale Anchor" },
+          { name: "LLA_ABND_Checkout_Catalog_T1_Metro", spend: 8502, clicks: 1262, orders: 7, cpa: 1215, roas: "4.30x", impact: "Checkout Recovery" },
+          { name: "TOF_Catalog_All_Products_Golf_T1_Metro", spend: 4447, clicks: 1370, orders: 7, cpa: 635, roas: "5.20x", impact: "Low CPA Acquisition" },
+          { name: "Remarketing-campaign-6th-sept", spend: 577, clicks: 49, orders: 2, cpa: 288, roas: "21.70x", impact: "Peak ROAS Delivery" }
+        ]
+      },
+      w2: {
+        spend: 23564,
+        revenue: 122530,
+        roas: "5.20x",
+        orders: 12,
+        cpa: 1964,
+        notes: "Week 2 prioritized audience qualification and creative diversification. The **Customer Data LLA reached peak efficiency at 7.37x Ads ROAS**, proving our static and video creative formats are connecting deeply with high-tier buyers. Retargeting continued its powerhouse run at **13.06x ROAS**.",
+        bullets: [
+          "💎 **Peak LLA Efficiency:** Customer lookalikes soared to 7.37x direct ROAS.",
+          "🎯 **Remarketing Consistency:** Sustained over 13x ROAS with fast turnaround.",
+          "📊 **Audience Testing:** Video assets deployed to prep warm audiences for W3 & W4."
+        ],
+        campaigns: [
+          { name: "LLA_Customers_Data_Statics_Video_Conversion", spend: 5983, clicks: 1071, orders: 5, cpa: 1197, roas: "7.37x", impact: "Top Converting Asset" },
+          { name: "Remarketing-campaign-6th-sept", spend: 2857, clicks: 313, orders: 2, cpa: 1429, roas: "13.06x", impact: "High-Margin Margin Closer" },
+          { name: "TOF_Catalog_All_Products_Golf_T1_Metro", spend: 5428, clicks: 1446, orders: 3, cpa: 1809, roas: "3.20x", impact: "Top-Funnel Footprint" },
+          { name: "LLA_ABND_Checkout_Catalog_T1_Metro", spend: 4821, clicks: 801, orders: 1, cpa: 4821, roas: "2.10x", impact: "Cart Remarketing" },
+          { name: "Adv+shopping+TOF-video-campaign", spend: 2374, clicks: 201, orders: 1, cpa: 2374, roas: "1.80x", impact: "Creative Learning Phase" }
+        ]
+      },
+      w3: {
+        spend: 21157,
+        revenue: 99440,
+        roas: "4.70x",
+        orders: 11,
+        cpa: 1923,
+        notes: "A week of precise tactical optimization. We strategically reallocated budget into the new **Advantage+ Catalog Campaign, which paid off immediately with a 4.57x Ads ROAS** at ₹1,133 CPA. Meanwhile, Abandoned Checkout campaigns rebounded to a stellar **5.32x ROAS**, protecting client profitability.",
+        bullets: [
+          "🔥 **Advantage+ Catalog Breakout:** Scaled smoothly with 4.57x ROAS.",
+          "⚡ **Recovery Rebound:** Abandoned Checkout ads jumped back to 5.32x ROAS.",
+          "🛡️ **Budget Control:** Spend dialed back smartly while eliminating low-yield test ad sets."
+        ],
+        campaigns: [
+          { name: "Adv+catalog_TOF_campaign", spend: 3398, clicks: 429, orders: 3, cpa: 1133, roas: "4.57x", impact: "New Scalable Winner" },
+          { name: "LLA_ABND_Checkout_Catalog_T1_Metro", spend: 2816, clicks: 356, orders: 2, cpa: 1408, roas: "5.32x", impact: "High ROAS Recovery" },
+          { name: "TOF_Catalog_All_Products_Golf_T1_Metro", spend: 2845, clicks: 686, orders: 2, cpa: 1422, roas: "4.63x", impact: "Stable Acquisition" },
+          { name: "LLA_Customers_Data_Statics_Video_Conversion", spend: 7349, clicks: 1311, orders: 4, cpa: 1837, roas: "3.84x", impact: "Volume Support" }
+        ]
+      },
+      w4: {
+        spend: 23417,
+        revenue: 155920,
+        roas: "6.66x",
+        orders: 21,
+        cpa: 1115,
+        notes: "A blockbuster final stretch! Week 4 delivered the **highest weekly ad revenue and peaked at 6.66x Ads ROAS**. The newly perfected **Adv+ TOF (TCPR) campaign smashed targets, generating 8 purchases at an astonishing 12.69x ROAS with an ultra-cheap ₹436 CPA**. Add-to-Carts reached a monthly high of 236.",
+        bullets: [
+          "🚀 **Star Campaign Born:** Adv+ TOF TCPR generated 8 orders at 12.69x ROAS (₹436 CPA).",
+          "📈 **Record Add-To-Carts:** 236 ATCs and 86 Checkouts created strong pipeline.",
+          "🏆 **Client Peak:** ₹1.55L+ in direct ad revenue to cap off September with massive momentum."
+        ],
+        campaigns: [
+          { name: "Adv+TOF-campaign-TCPR", spend: 3492, clicks: 1093, orders: 8, cpa: 437, roas: "12.69x", impact: "Record Breaking Efficiency" },
+          { name: "LLA_Customers_Data_Statics_Video_Conversion", spend: 8694, clicks: 1360, orders: 5, cpa: 1739, roas: "6.04x", impact: "Strong Scaled Returns" },
+          { name: "LLA_ABND_Checkout_Catalog_T1_Metro", spend: 3072, clicks: 446, orders: 2, cpa: 1536, roas: "4.60x", impact: "High Quality Conversions" },
+          { name: "Adv+catalog_TOF_campaign", spend: 4629, clicks: 609, orders: 3, cpa: 1543, roas: "3.30x", impact: "Consistent TOF Driver" },
+          { name: "TOF_Catalog_All_Products_Golf_T1_Metro", spend: 3530, clicks: 963, orders: 3, cpa: 1177, roas: "2.53x", impact: "Baseline Catalog Sales" }
+        ]
+      }
+    };
+
+    // Chart Controller
+    let chartInstance = null;
+
+    const chartConfigs = {
+      roas: {
+        title: "Meta Ads ROAS Progression",
+        subtitle: "Direct advertising return holding high at 5.56x full-month average",
+        tag: "Week 4 Peak: 6.66x",
+        type: "line",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [{
+            label: "Ads ROAS",
+            data: [5.60, 5.20, 4.70, 6.66],
+            borderColor: "#10b981",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: "#10b981",
+            pointRadius: 6
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 3,
+              ticks: { callback: (v) => v + "x" }
+            }
+          }
+        }
+      },
+      cpa: {
+        title: "Cost Per Acquisition (CPA) in ₹",
+        subtitle: "Demonstrating declining acquisition cost into month-end",
+        tag: "Lowest CPA: ₹436",
+        type: "line",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [{
+            label: "CPA (₹)",
+            data: [1001, 1964, 1923, 1115],
+            borderColor: "#ef4444",
+            backgroundColor: "rgba(239, 68, 68, 0.08)",
+            fill: true,
+            tension: 0.35,
+            borderWidth: 3,
+            pointBackgroundColor: "#ef4444",
+            pointRadius: 6
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              ticks: { callback: (v) => "₹" + v }
+            }
+          }
+        }
+      },
+      rev_spend: {
+        title: "Meta Ad Spend vs Generated Ad Revenue (₹)",
+        subtitle: "Strong direct revenue spread across all 4 weeks",
+        tag: "Total Revenue: ₹5.12L+",
+        type: "bar",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "Ad Spend (₹)",
+              data: [24013, 23564, 21157, 23417],
+              backgroundColor: "#94a3b8"
+            },
+            {
+              label: "Ad Revenue (₹)",
+              data: [134475, 122530, 99440, 155920],
+              backgroundColor: "#2563eb"
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              ticks: { callback: (v) => "₹" + (v/1000) + "k" }
+            }
+          }
+        }
+      },
+      purchases: {
+        title: "Purchases (Order Volume Trend)",
+        subtitle: "Consistent customer acquisitions culminating in 68 total purchases",
+        tag: "Total: 68 Orders",
+        type: "bar",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [{
+            label: "Orders Delivered",
+            data: [24, 12, 11, 21],
+            backgroundColor: "#0ea5e9",
+            borderRadius: 6
+          }]
+        },
+        options: {
+          scales: { y: { beginAtZero: true } }
+        }
+      },
+      funnel: {
+        title: "Full Account Conversion Funnel",
+        subtitle: "High-intent movement from impressions to verified purchases",
+        tag: "Cart-to-Checkout: 35.8%",
+        type: "bar",
+        data: {
+          labels: ["Clicks (15,945)", "Landing Page Views (13,253)", "Add to Cart (744)", "Checkouts (267)", "Purchases (68)"],
+          datasets: [{
+            label: "Funnel Volume",
+            data: [15945, 13253, 744, 267, 68],
+            backgroundColor: ["#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#10b981"],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          scales: { x: { type: 'logarithmic' } }
+        }
+      }
+    };
+
+    function renderChart(metricKey) {
+      const config = chartConfigs[metricKey];
+      document.getElementById("chartTitle").innerText = config.title;
+      document.getElementById("chartSubtitle").innerText = config.subtitle;
+      document.getElementById("chartTag").innerText = config.tag;
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      const ctx = document.getElementById("performanceChart").getContext("2d");
+      chartInstance = new Chart(ctx, {
+        type: config.type,
+        data: config.data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: config.data.datasets.length > 1, position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  let val = ctx.raw;
+                  if (metricKey === 'roas') return ` Ads ROAS: ${val}x`;
+                  if (metricKey === 'cpa' || metricKey === 'rev_spend') return ` ${ctx.dataset.label}: ₹${val.toLocaleString('en-IN')}`;
+                  return ` ${ctx.dataset.label}: ${val.toLocaleString('en-IN')}`;
+                }
+              }
+            }
+          },
+          ...config.options
+        }
+      });
+    }
+
+    function updateDashboard(timeframeKey) {
+      const data = dashboardData[timeframeKey];
+
+      // Update KPI Cards
+      document.getElementById("cardSpend").innerText = formatINR(data.spend);
+      document.getElementById("cardRevenue").innerText = formatINR(data.revenue);
+      document.getElementById("cardROAS").innerText = data.roas;
+      document.getElementById("cardOrders").innerText = data.orders;
+      document.getElementById("cardCPA").innerText = formatINR(data.cpa);
+
+      // Update Positive Notes
+      document.getElementById("notesContent").innerHTML = data.notes.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+      
+      const bulletsContainer = document.getElementById("notesHighlights");
+      bulletsContainer.innerHTML = data.bullets.map(b => `
+        <div class="bg-white/5 rounded-lg p-2.5 border border-white/10">
+          ${b.replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-300 font-semibold">$1</strong>')}
+        </div>
+      `).join("");
+
+      // Update Campaigns Table
+      const tableBody = document.getElementById("campaignTableBody");
+      tableBody.innerHTML = data.campaigns.map(c => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="py-3 px-4 font-medium text-slate-800">${c.name}</td>
+          <td class="py-3 px-4 font-semibold text-slate-900">${formatINR(c.spend)}</td>
+          <td class="py-3 px-4 text-slate-600">${c.clicks.toLocaleString('en-IN')}</td>
+          <td class="py-3 px-4 font-bold text-slate-900">${c.orders}</td>
+          <td class="py-3 px-4 text-slate-700">${formatINR(c.cpa)}</td>
+          <td class="py-3 px-4 font-bold text-emerald-600">${c.roas}</td>
+          <td class="py-3 px-4">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              ${c.impact}
+            </span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    // Event Listeners
+    document.getElementById("timeframeSelect").addEventListener("change", (e) => {
+      updateDashboard(e.target.value);
+    });
+
+    document.getElementById("metricSelect").addEventListener("change", (e) => {
+      renderChart(e.target.value);
+    });
+
+    // Initial Load
+    window.addEventListener("DOMContentLoaded", () => {
+      renderChart("roas");
+      updateDashboard("all");
+    });
+  </script>
+</body>
+</html>
